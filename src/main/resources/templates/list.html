@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>列表</title>
+</head>
+<body>
+<div style="text-align: center">
+    <table style="width: 80%;min-width: 680px;max-width: 1000px;margin:auto">
+        <thead>
+        <tr>
+            <th>id</th>
+            <th style="max-width: 40px">图标</th>
+            <th>名称</th>
+            <th>版本号</th>
+            <th>跟新说明</th>
+            <th>发布时间</th>
+            <th>下载</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item:${list.content}">
+            <td th:text="${item.id}">id</td>
+            <td><img th:src="@{'http://test.visionagent.cn/app/'+${item.id}+'/png'}" width="40px" height="40px"/></td>
+            <td th:text="${item.name}">名称</td>
+            <td><span><span th:text="${item.version}"></span> (<span th:text="${item.code}"></span>)</span></td>
+            <td th:text="${item.content}" style="white-space: normal;word-wrap: break-word;word-break: break-all;"></td>
+            <td th:text="${item.createTime}">发布时间</td>
+            <td><a th:href="@{'http://test.visionagent.cn/app/'+${item.id}+'/apk'}">下载</a></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

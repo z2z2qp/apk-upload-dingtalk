@@ -2,6 +2,7 @@ package com.visionagent.apptest.controller
 
 import com.dingtalk.api.request.OapiRobotSendRequest
 import com.visionagent.apptest.entity.App
+import com.visionagent.apptest.model.request.QueryList
 import com.visionagent.apptest.service.AppService
 import com.visionagent.util.DingRobotUtil
 import lombok.Getter
@@ -9,12 +10,11 @@ import lombok.Setter
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.system.ApplicationHome
 import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.ui.Model
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.support.AbstractMultipartHttpServletRequest
+import org.springframework.web.servlet.ModelAndView
 import tinker.net.dongliu.apk.parser.ApkParser
 import java.io.File
 import java.io.FileInputStream
@@ -143,5 +143,24 @@ class AppController {
         } else {
             return "error"
         }
+    }
+
+    @GetMapping("/list")
+    fun getList(query: QueryList): ModelAndView {
+        val list = appService.queryList(query)
+        list.get().forEach {
+            it.apk = ""
+            it.icon = ""
+        }
+        val mv = ModelAndView()
+        mv.viewName = "list"
+        mv.addObject("list", list)
+        return mv
+    }
+
+    @ResponseBody
+    @GetMapping("/name")
+    fun getName(): List<String> {
+        return appService.getNames()
     }
 }
