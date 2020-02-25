@@ -21,4 +21,10 @@ data class App(
         var version: String,
         var code: Int,
         var content: String,
-        var createTime: Date?)
+        var createTime: Date?,
+        var name:String,
+        var icon:String) {
+        constructor() : this(null,"","","",0,"",Date(),"","") {
+
+        }
+}

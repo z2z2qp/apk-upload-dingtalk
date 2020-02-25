@@ -11,5 +11,5 @@ import org.springframework.data.jpa.repository.JpaRepository
  */
 interface AppRepository : JpaRepository<App, Int>{
 
-    fun findAppByPackageNameAndCode(packageName:String,code:Int):App
+    fun findAppByPackageNameAndCode(packageName:String,code:Int):App?
 }

@@ -18,7 +18,7 @@ import org.springframework.web.multipart.support.AbstractMultipartHttpServletReq
 import tinker.net.dongliu.apk.parser.ApkParser
 import java.io.File
 import java.io.FileInputStream
-import java.net.Inet4Address
+import java.io.FileOutputStream
 import java.util.*
 import javax.annotation.Resource
 import javax.servlet.http.HttpServletRequest
@@ -44,9 +44,8 @@ class AppController {
     private val secret: String? = null
     @Value("\${app.webhook}")
     private val webhook: String? = null
-
-    @Value("\${server.port}")
-    private var port: Int = 8080
+    @Value("\${app.host}")
+    private val host: String = "localhost:9999"
 
     private fun writeFile(file: MultipartFile): File? {
         return if (file.isEmpty) {
@@ -62,45 +61,57 @@ class AppController {
         }
     }
 
-    private fun save(file: File, content: String): ApkParser? {
+    private fun save(file: File, content: String): App? {
         val apkParser = ApkParser(file)
         val packageName = apkParser.apkMeta.packageName
         val code = apkParser.apkMeta.versionCode
         val version = apkParser.apkMeta.versionName
-        val app = App(null, packageName, file.absolutePath, version, code.toInt(), content, Date())
+        val name = apkParser.apkMeta.name
+        val absolutePath = File(ApplicationHome(this.javaClass).source.parentFile.toString() + "/apk")
+        val icon = apkParser.iconFile.data
+        val f = File(absolutePath, "$packageName.png")
+        val fos = FileOutputStream(f)
+        fos.write(icon)
+        fos.flush()
+        fos.close()
+        val app = App(null, packageName, file.absolutePath, version, code.toInt(), content, Date(), name, f.absolutePath)
         return if (appService.save(app).id != null) {
-            apkParser
+            app
         } else {
             null
         }
     }
 
-    private fun getIP(): String {
-        return Inet4Address.getLocalHost().hostAddress
-    }
-
-    private fun send(apkParser: ApkParser, content: String, at: List<String>): Boolean {
+    private fun send(app: App, content: String, at: List<String>): Boolean {
         val robot = DingRobotUtil(secret, webhook)
         val link = OapiRobotSendRequest.Link()
-        link.title = "${apkParser.apkMeta.name}(${apkParser.apkMeta.versionName})测试"
+        link.title = "${app.name}(${app.version})测试"
         link.text = content
-        link.messageUrl = "http://${getIP()}:$port/app/${apkParser.apkMeta.packageName}/${apkParser.apkMeta.versionCode}"
-        return robot.sendAt(link, at)
+        link.messageUrl = "http://$host/app/${app.id}/apk"
+        link.picUrl = "http://$host/app/${app.id}/icon"
+        return robot.send(link, at)
     }
 
-    @GetMapping("/{packageName}/{code}")
-    fun getApk(@PathVariable packageName: String, @PathVariable code: Int, response: HttpServletResponse) {
-        val app = appService.getByPackageNameAndCode(packageName, code)
-        val apk = app.apk
-        val file = File(apk)
-        if (file.exists()) {
-            val fis = FileInputStream(file)
-            response.setHeader("Content-Disposition", "attachment;filename=${file.name}")
-            val os = response.outputStream
-            val byteArray = ByteArray(fis.available())
-            fis.read(byteArray)
-            fis.close()
-            os.write(byteArray)
+    @GetMapping("/{id}/{type}")
+    fun getApk(@PathVariable id: Int, @PathVariable type: String, response: HttpServletResponse) {
+        val app = appService.getAppById(id)
+        if (app != null) {
+            val filePath = if (type == "apk") {
+                app.apk
+            } else {
+                app.icon
+            }
+
+            val file = File(filePath)
+            if (file.exists()) {
+                val fis = FileInputStream(file)
+                response.setHeader("Content-Disposition", "attachment;filename=${file.name}")
+                val os = response.outputStream
+                val byteArray = ByteArray(fis.available())
+                fis.read(byteArray)
+                fis.close()
+                os.write(byteArray)
+            }
         }
     }
 
@@ -114,12 +125,12 @@ class AppController {
                 return if (file == null) {
                     "error"
                 } else {
-                    val apkParser = save(file, content)
-                    if (apkParser == null) {
+                    val app = save(file, content)
+                    if (app == null) {
                         "error"
                     } else {
                         val at = request.getParameter("at").split(",")
-                        if (send(apkParser, content, at)) {
+                        if (send(app, content, at)) {
                             "success"
                         } else {
                             "error"

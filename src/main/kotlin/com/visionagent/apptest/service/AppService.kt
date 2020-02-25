@@ -21,7 +21,11 @@ class AppService{
         return appRepository.save(app)
     }
 
-    fun getByPackageNameAndCode(packageName: String, code: Int): App {
+    fun getByPackageNameAndCode(packageName: String, code: Int): App? {
         return appRepository.findAppByPackageNameAndCode(packageName,code)
+    }
+
+    fun getAppById(id:Int):App?{
+        return appRepository.getOne(id)
     }
 }
