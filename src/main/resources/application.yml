@@ -4,10 +4,14 @@ app:
   host: test.visionagent.cn
 spring:
   datasource:
-    driver-class-name: org.sqlite.JDBC
-    url: jdbc:sqlite:${user.home}\app.sqlite
-    username:
-    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/app?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8&allowPublicKeyRetrieval=true&useOldAliasMetadataBehavior=true
+    username: dxl
+    password: dxl@2020
+  #    driver-class-name: org.sqlite.JDBC
+#    url: jdbc:sqlite:${user.home}\app.sqlite
+#    username:
+#    password:
   jpa:
     show-sql: true
     properties:

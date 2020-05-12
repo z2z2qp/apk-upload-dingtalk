@@ -43,7 +43,7 @@ class AppService {
         } else {
             query.rows
         }
-        val pageable = PageRequest.of(page!!, rows!!)
+        val pageable = PageRequest.of(page, rows!!)
         return if (query.name == null) {
             appRepository.findAll(pageable)
         } else {
