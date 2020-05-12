@@ -10,7 +10,6 @@ import lombok.Setter
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.system.ApplicationHome
 import org.springframework.stereotype.Controller
-import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.support.AbstractMultipartHttpServletRequest
@@ -42,8 +41,10 @@ class AppController {
 
     @Value("\${app.secret}")
     private val secret: String? = null
+
     @Value("\${app.webhook}")
     private val webhook: String? = null
+
     @Value("\${app.host}")
     private val host: String = "localhost:9999"
 
@@ -92,6 +93,11 @@ class AppController {
         return robot.send(link, at)
     }
 
+    /**
+     * 获取apk 相关文件
+     * @param id app id
+     * @param type apk 或者其他
+     */
     @GetMapping("/{id}/{type}")
     fun getApk(@PathVariable id: Int, @PathVariable type: String, response: HttpServletResponse) {
         val app = appService.getAppById(id)
@@ -115,6 +121,13 @@ class AppController {
         }
     }
 
+    /**
+     * 文件上传
+     * content 文字信息
+     * apk apk文件
+     * at 无用
+     * @return 跳转页面
+     */
     @PostMapping("/upload")
     fun upload(request: HttpServletRequest): String {
         if (request is AbstractMultipartHttpServletRequest) {
@@ -145,6 +158,11 @@ class AppController {
         }
     }
 
+    /**
+     * 获取列表
+     * @param query 查询参数
+     * @return model
+     */
     @GetMapping("/list")
     fun getList(query: QueryList): ModelAndView {
         val list = appService.queryList(query)
@@ -158,6 +176,9 @@ class AppController {
         return mv
     }
 
+    /**
+     * 获取app 名称
+     */
     @ResponseBody
     @GetMapping("/name")
     fun getName(): List<String> {
