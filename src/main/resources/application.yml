@@ -2,6 +2,9 @@ app:
   secret: SEC2167dc252d45f4e05d6e0f337e32101f349fd69272563ea781d55372e5140392
   webhook: https://oapi.dingtalk.com/robot/send?access_token=17925dfa078afdca36a68a50daef9a8585686a9de481707c658815ad6b7edbf6
   host: test.visionagent.cn
+  wx:
+    token: itrun
+    key: G4vh9xI7cdPcQRGsB3fxR1l2w04r1XFTUOYG4qgNHA1
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
