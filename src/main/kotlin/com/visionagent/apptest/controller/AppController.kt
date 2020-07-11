@@ -63,11 +63,13 @@ class AppController {
     }
 
     private fun save(file: File, content: String): App? {
+        //分析app 内容信息
         val apkParser = ApkParser(file)
         val packageName = apkParser.apkMeta.packageName
         val code = apkParser.apkMeta.versionCode
         val version = apkParser.apkMeta.versionName
         val name = apkParser.apkMeta.name
+        //获取路径并将icon写入本地磁盘
         val absolutePath = File(ApplicationHome(this.javaClass).source.parentFile.toString() + "/apk")
         val icon = apkParser.iconFile.data
         val f = File(absolutePath, "$packageName.png")
@@ -75,6 +77,7 @@ class AppController {
         fos.write(icon)
         fos.flush()
         fos.close()
+        //创建App对象 并保存
         val app = App(null, packageName, file.absolutePath, version, code.toInt(), content, Date(), name, f.absolutePath)
         return if (appService.save(app).id != null) {
             app
@@ -130,32 +133,24 @@ class AppController {
      */
     @PostMapping("/upload")
     fun upload(request: HttpServletRequest): String {
+        var result = "error";
         if (request is AbstractMultipartHttpServletRequest) {
             val content = request.getParameter("content")
             val files = request.multiFileMap
-            if (files.size > 0) {
+            if (files.size > 0) {//参数中包含文件
                 val file = writeFile(files.getFirst("apk")!!)
-                return if (file == null) {
-                    "error"
-                } else {
+                if (file != null) {//写入文件成功
                     val app = save(file, content)
-                    if (app == null) {
-                        "error"
-                    } else {
+                    if (app != null) {//保存成功
                         val at = request.getParameter("at").split(",")
-                        if (send(app, content, at)) {
-                            "success"
-                        } else {
-                            "error"
+                        if (send(app, content, at)) {//发送成功
+                            result = "success"
                         }
                     }
                 }
-            } else {
-                return "error"
             }
-        } else {
-            return "error"
         }
+        return result
     }
 
     /**
