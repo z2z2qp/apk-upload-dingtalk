@@ -1,17 +1,23 @@
 app:
-  secret: SEC2167dc252d45f4e05d6e0f337e32101f349fd69272563ea781d55372e5140392
-  webhook: https://oapi.dingtalk.com/robot/send?access_token=17925dfa078afdca36a68a50daef9a8585686a9de481707c658815ad6b7edbf6
-  host: test.visionagent.cn
+  dd:
+    #钉钉 secret
+    secret: SEC2167dc252d45f4e05d6e0f337e32101f349fd69272563ea781d55372e5140392
+    #钉钉 webhook
+    webhook: https://oapi.dingtalk.com/robot/send?access_token=17925dfa078afdca36a68a50daef9a8585686a9de481707c658815ad6b7edbf6
+    #文件调用地址
+    host: test.visionagent.cn
+  #微信配置
   wx:
     token: itrun
     key: G4vh9xI7cdPcQRGsB3fxR1l2w04r1XFTUOYG4qgNHA1
 spring:
+  #数据库配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/app?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8&allowPublicKeyRetrieval=true&useOldAliasMetadataBehavior=true
     username: dxl
     password: dxl@2020
-  #    driver-class-name: org.sqlite.JDBC
+#    driver-class-name: org.sqlite.JDBC
 #    url: jdbc:sqlite:${user.home}\app.sqlite
 #    username:
 #    password:

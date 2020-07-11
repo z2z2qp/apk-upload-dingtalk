@@ -39,13 +39,13 @@ class AppController {
     @Resource(name = "appService")
     lateinit var appService: AppService
 
-    @Value("\${app.secret}")
+    @Value("\${app.dd.secret}")
     private val secret: String? = null
 
-    @Value("\${app.webhook}")
+    @Value("\${app.dd.webhook}")
     private val webhook: String? = null
 
-    @Value("\${app.host}")
+    @Value("\${app.dd.host}")
     private val host: String = "localhost:9999"
 
     private fun writeFile(file: MultipartFile): File? {
